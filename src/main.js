@@ -13,8 +13,11 @@ import store from './store'
 import router from './router'
 
 import '@/icons' // icon
-import '@/permission' // permission control
+//import '@/permission' // permission control
+import VueCompositionAPI from '@vue/composition-api'
+Vue.use(VueCompositionAPI)
 
+Vue.use(ElementUI);
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
