@@ -278,6 +278,29 @@
                 </el-button>
               </div>
 
+              <!-- 进度条区域 -->
+              <div v-if="loading" class="progress-section mt-20">
+                <div class="progress-info">
+                  <span class="progress-text">{{ progressText }}</span>
+                  <el-button
+                    type="danger"
+                    size="mini"
+                    icon="el-icon-close"
+                    circle
+                    @click.stop="interruptProcess"
+                    class="interrupt-btn"
+                    style="z-index: 1000;"
+                    title="点击中断处理"
+                  />
+                </div>
+                <el-progress 
+                  :percentage="progressPercentage" 
+                  :stroke-width="8"
+                  :show-text="false"
+                  :color="progressColor"
+                />
+              </div>
+
             </div>
 
             <!-- 右半部分：实体替换 -->
@@ -342,7 +365,7 @@
 
 
 <script>
-import axios from 'axios'
+import { processDesensitize } from '@/utils/daili'
 
 export default {
   data() {
@@ -380,6 +403,14 @@ export default {
       pressedExport: false,
 
       loading: false,
+      // 进度条相关变量
+      progressPercentage: 0,
+      progressText: '',
+      progressColor: '#409EFF',
+      currentStage: 0,
+      // 中断相关变量
+      isInterrupted: false,
+      abortController: null,
       inputText: `2024年5月8日，上市公司大米集团市场部经理刘丽就大米集团在新能源汽车领域未来的发展与比克里能源有限公司总经理李海欣在海珠市喜来登大酒店进行会谈，双方会中达成合作共识，比克里能源有限公司将承担起大米集团整车制作过程中的关键能源技术支持和材料提供工作。会后双方前往位于海珠桂园区的大米集团新能源汽车研发总部进行参观，李海欣经理表示看好未来的发展前景`,
       outputText: '',
       exampleText: "张三2024年9月21日在梅花西路128号与李四签订两百块的合作协议[金额'两百块']",
@@ -389,7 +420,8 @@ export default {
       algorithmModes: ['关键词模糊', '同义替换'],
       patternMap: {
         '关键词模糊': 1,
-        '同义替换': 2
+        '同义替换': 2,
+        '基于示例学习': 3
       },
       selectedAlgorithm: '规则匹配',
       defaultDemoData: {
@@ -556,54 +588,133 @@ export default {
       // },
 
     async handleDesensitize() {
-  this.loading = true;
-  try {
-    this.parseExample();
+      this.loading = true;
+      this.isInterrupted = false;
+      this.currentStage = 0;
+      this.progressPercentage = 0;
+      this.progressText = '准备开始处理...';
+      this.progressColor = '#409EFF';
+      
+      // 创建AbortController用于中断请求
+      this.abortController = new AbortController();
+      
+      try {
+        // 第一阶段：准备数据 (0-25%)
+        this.currentStage = 1;
+        this.progressText = '正在准备数据...';
+        this.progressPercentage = 0;
+        
+        // 检查是否被中断
+        if (this.isInterrupted) {
+          throw new Error('用户中断了处理');
+        }
+        
+        this.parseExample();
+        const demos = [
+          ...this.generateDynamicDemos(),
+          ...this.getSelectedPresetDemos()
+        ];
 
-    const demos = [
-      ...this.generateDynamicDemos(),
-      ...this.getSelectedPresetDemos()
-    ];
+        // 构造基础请求体
+        const requestData = {
+          entity_type: this.keywords.join('、'),
+          demos: demos,
+          patten: this.patternMap[this.selectedAlgorithm],
+          keywords: this.keywords  // 添加关键词字段
+        };
 
-    // ✅ 构造基础请求体
-    const requestData = {
-      entity_type: this.keywords.join('、'),
-      demos: demos,
-      patten: this.patternMap[this.selectedAlgorithm]
-    };
+        // 判断是否使用 uploadedFileContent
+        if (this.uploadedFileContent) {
+          requestData.file = this.uploadedFileContent;
+          console.log("📦 发送文件内容：", this.uploadedFileContent);
+        } else if (this.inputText && this.inputText.trim().length > 0) {
+          requestData.text = this.inputText.trim();
+          console.log("✏️ 发送用户手写文本：", this.inputText.trim());
+        } else {
+          this.$message.warning("请先输入文本或上传文件！");
+          this.loading = false;
+          return;
+        }
 
-    // ✅ 判断是否使用 uploadedFileContent
-    if (this.uploadedFileContent) {
-      requestData.file = this.uploadedFileContent;
-      console.log("📦 发送文件内容：", this.uploadedFileContent);
-    } else if (this.inputText && this.inputText.trim().length > 0) {
-      requestData.text = this.inputText.trim();
-      console.log("✏️ 发送用户手写文本：", this.inputText.trim());
-    } else {
-      this.$message.warning("请先输入文本或上传文件！");
-      this.loading = false;
-      return;
-    }
+        // 模拟上传进度 (0-25%)
+        await this.simulateProgress(0, 25, 500);
+        
+        // 检查是否被中断
+        if (this.isInterrupted) {
+          throw new Error('用户中断了处理');
+        }
+        
+        // 第二阶段：后端处理 (25-100%)
+        this.currentStage = 2;
+        this.progressText = '正在处理数据...';
+        this.progressColor = '#67C23A';
+                
+        // 在第651行附近，替换API调用
+        // const res = await axios.post('/api/process', requestData, {
+        //   headers: {
+        //     'Content-Type': 'application/json'
+        //   },
+        //   signal: this.abortController.signal
+        // });
 
-    const res = await axios.post('/api/process', requestData, {
-      headers: {
-        'Content-Type': 'application/json'
+        const res = await processDesensitize(requestData);
+
+        // 检查是否被中断
+        if (this.isInterrupted) {
+          throw new Error('用户中断了处理');
+        }
+
+        // 模拟后端处理进度 (25-95%)
+        await this.simulateProgress(25, 95, 1000);
+        
+        // 检查是否被中断
+        if (this.isInterrupted) {
+          throw new Error('用户中断了处理');
+        }
+        
+        // 第三阶段：完成 (95-100%)
+        this.currentStage = 3;
+        this.progressText = '处理完成';
+        this.progressColor = '#67C23A';
+        this.progressPercentage = 100;
+
+        this.outputText = res.data.result;
+        this.entityPairs = res.data.word_dic
+          ? Object.entries(res.data.word_dic).map(([before, after]) => ({ before, after }))
+          : [];
+
+        this.$message.success('脱敏成功');
+        
+        // 延迟关闭进度条
+        setTimeout(() => {
+          this.loading = false;
+          this.currentStage = 0;
+          this.progressPercentage = 0;
+          this.isInterrupted = false;
+        }, 1000);
+        
+      } catch (e) {
+        console.error('❌ 请求失败：', e);
+        
+        if (this.isInterrupted) {
+          this.progressText = '已中断处理';
+          this.progressColor = '#E6A23C';
+          this.$message.warning('处理已中断');
+        } else {
+          this.progressText = '处理失败';
+          this.progressColor = '#F56C6C';
+          this.$message.error('处理失败');
+        }
+        
+        // 延迟关闭进度条
+        setTimeout(() => {
+          this.loading = false;
+          this.currentStage = 0;
+          this.progressPercentage = 0;
+          this.isInterrupted = false;
+        }, 2000);
       }
-    });
-
-    this.outputText = res.data.result;
-    this.entityPairs = res.data.word_dic
-      ? Object.entries(res.data.word_dic).map(([before, after]) => ({ before, after }))
-      : [];
-
-    this.$message.success('脱敏成功');
-  } catch (e) {
-    console.error('❌ 请求失败：', e);
-    this.$message.error('处理失败');
-  } finally {
-    this.loading = false;
-  }
-},
+    },
 
     selectAlgorithm(mode) {
       this.selectedAlgorithm = mode;
@@ -693,6 +804,65 @@ export default {
     removeUploadedFile() {
       this.uploadedFileName = '';
       this.uploadedFileContent = null;
+    },
+
+    // 中断处理方法
+    interruptProcess() {
+      console.log('中断按钮被点击');
+      
+      // 立即显示消息确认按钮被点击
+      this.$message.info('中断按钮被点击');
+      
+      this.isInterrupted = true;
+      
+      // 中断HTTP请求
+      if (this.abortController) {
+        this.abortController.abort();
+        console.log('HTTP请求已中断');
+      }
+      
+      // 立即更新UI状态
+      this.progressText = '正在中断...';
+      this.progressColor = '#E6A23C';
+      
+      console.log('用户中断了处理');
+      
+      // 立即关闭loading状态
+      setTimeout(() => {
+        this.loading = false;
+        this.currentStage = 0;
+        this.progressPercentage = 0;
+        this.isInterrupted = false;
+        this.$message.warning('处理已中断');
+      }, 500);
+    },
+
+    // 模拟进度条进度
+    simulateProgress(start, end, duration) {
+      return new Promise((resolve, reject) => {
+        const steps = 20;
+        const increment = (end - start) / steps;
+        const interval = duration / steps;
+        let current = start;
+        
+        const timer = setInterval(() => {
+          // 检查是否被中断
+          if (this.isInterrupted) {
+            clearInterval(timer);
+            console.log('进度模拟被中断');
+            reject(new Error('用户中断了处理'));
+            return;
+          }
+          
+          current += increment;
+          this.progressPercentage = Math.min(current, end);
+          
+          if (current >= end) {
+            clearInterval(timer);
+            resolve();
+          }
+        }, interval);
+      });
     }
   }
 }
@@ -758,5 +928,46 @@ export default {
   background: #f9f9f9;
   border: 1px solid #ddd;
   border-radius: 6px;
+}
+
+/* 进度条样式 */
+.progress-section {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 10;
+}
+
+.progress-text {
+  font-size: 14px;
+  color: #606266;
+  font-weight: 500;
+}
+
+.interrupt-btn {
+  transition: all 0.3s ease;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 1000;
+}
+
+.interrupt-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(245, 108, 108, 0.3);
+}
+
+.interrupt-btn:active {
+  transform: scale(0.95);
 }
 </style>
