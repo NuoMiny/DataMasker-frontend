@@ -33,18 +33,6 @@ import Layout from '@/layout'
 export const constantRoutes = [
  
   {
-    path: '/',
-    component: Layout,
-    redirect: '/dashboard',
-    children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
-      meta: { title: '首页', icon: 'dashboard' }
-    }]
-  },
-
-  {
     path: '/desensitize',
     component: Layout,
     children: [
@@ -55,6 +43,31 @@ export const constantRoutes = [
         meta: { title: '脱敏工具', icon: 'form' }
       }
     ]
+  },
+
+  {
+    path: '/history',
+    component: Layout,
+    children: [
+      {
+        path: 'history',
+        name: 'History',
+        component: () => import('@/views/history/index'),
+        meta: { title: '历史记录', icon: 'nested' }
+      }
+    ]
+  },
+
+  {
+    path: '/',
+    component: Layout,
+    redirect: '/dashboard',
+    children: [{
+      path: 'dashboard',
+      name: 'Dashboard',
+      component: () => import('@/views/dashboard/index'),
+      meta: { title: '帮助', icon: 'dashboard' }
+    }]
   },
 
   {
