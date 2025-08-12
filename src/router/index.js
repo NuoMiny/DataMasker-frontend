@@ -54,6 +54,13 @@ export const constantRoutes = [
         name: 'History',
         component: () => import('@/views/history/index'),
         meta: { title: '历史记录', icon: 'nested' }
+      },
+      {
+        path: 'detail/:id',
+        name: 'HistoryDetail',
+        component: () => import('@/views/history/historyDetail'),
+        meta: { title: '记录详情', activeMenu: '/history/index' },
+        hidden: true
       }
     ]
   },

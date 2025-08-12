@@ -8,6 +8,7 @@
         class="history-item"
         @mouseover="hoverItem(index)"
         @mouseleave="leaveItem(index)"
+        @click="goToDetail(record.id)"
       >
         <div class="item-left">
           <div class="file-icon">
@@ -25,7 +26,7 @@
           <button 
             class="delete-btn" 
             :class="{ 'show-btn': record.isHovered }"
-            @click="handleDelete(index)"
+            @click.stop="handleDelete(index)"
           >
             ×
           </button>
@@ -37,16 +38,16 @@
 
 <script>
 export default {
-  name: 'HistoryPage',
+  name: 'HistoryList',
   data() {
     return {
       records: [
-        { type: 'pdf', name: '财务报表2023', time: '2023-05-12T14:30:00', isHovered: false },
-        { type: 'word', name: '项目计划书初稿', time: '2023-05-11T09:15:00', isHovered: false },
-        { type: 'txt', name: '会议记录0428', time: '2023-05-10T16:45:00', isHovered: false },
-        { type: 'text', name: '这是一段纯文本的测试内容用来演示', time: '2023-05-09T11:20:00', isHovered: false },
-        { type: 'pdf', name: '用户使用手册', time: '2023-05-08T13:10:00', isHovered: false },
-        { type: 'word', name: '合同范本', time: '2023-05-07T10:05:00', isHovered: false }
+        { id: 1, type: 'pdf', name: '财务报表2023', time: '2023-05-12T14:30:00', isHovered: false },
+        { id: 2, type: 'word', name: '项目计划书初稿', time: '2023-05-11T09:15:00', isHovered: false },
+        { id: 3, type: 'txt', name: '会议记录0428', time: '2023-05-10T16:45:00', isHovered: false },
+        { id: 4, type: 'text', name: '这是一段纯文本的测试内容用来演示', time: '2023-05-09T11:20:00', isHovered: false },
+        { id: 5, type: 'pdf', name: '用户使用手册', time: '2023-05-08T13:10:00', isHovered: false },
+        { id: 6, type: 'word', name: '合同范本', time: '2023-05-07T10:05:00', isHovered: false }
       ]
     }
   },
@@ -68,15 +69,18 @@ export default {
       this.records[index].isHovered = false;
     },
     handleDelete(index) {
-      // 删除记录的逻辑
       console.log('删除记录:', index);
       // this.records.splice(index, 1);
+    },
+    goToDetail(id) {
+      this.$router.push({ name: 'HistoryDetail', params: { id } });
     }
   }
 }
 </script>
 
 <style scoped>
+/* 保持之前的样式不变 */
 .history-container {
   max-width: 800px;
   margin: 0 auto;
@@ -90,7 +94,6 @@ h2 {
 }
 
 .history-list {
-  /* 移除了边框 */
   border-radius: 8px;
   overflow: hidden;
 }
@@ -100,10 +103,10 @@ h2 {
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  /* 移除了底部边框 */
   transition: background-color 0.2s;
   margin-bottom: 8px;
   border-radius: 6px;
+  cursor: pointer;
 }
 
 .history-item:hover {
@@ -128,7 +131,7 @@ h2 {
   text-align: center;
   border-radius: 6px;
   color: white;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold;
 }
 
@@ -150,7 +153,7 @@ h2 {
 
 .file-name {
   color: #333;
-  font-size: 14px;
+  font-size: 16px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -164,7 +167,7 @@ h2 {
 
 .time {
   color: #999;
-  font-size: 12px;
+  font-size: 16px;
   margin-right: 16px;
 }
 
@@ -172,12 +175,12 @@ h2 {
   background: none;
   border: none;
   color: #999;
-  font-size: 18px;
+  font-size: 20px;
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.2s, background-color 0.2s;
-  width: 24px;
-  height: 24px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;

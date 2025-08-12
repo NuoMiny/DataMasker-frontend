@@ -1,14 +1,14 @@
 import axios from 'axios'
 
 // 创建一个新的axios实例
-// const service = axios.create({
-//   baseURL: 'http://114.132.160.53:12345/process', // 你的后端地址
-//   timeout: 500000000 // 请求超时时间
-// })
 const service = axios.create({
-  baseURL: 'http://localhost:12345', // 改为本地地址，去掉/process
+  baseURL: 'http://114.132.160.53:12345', // 你的后端地址
   timeout: 500000000 // 请求超时时间
 })
+// const service = axios.create({
+//   baseURL: 'http://localhost:12345', // 改为本地地址，去掉/process
+//   timeout: 500000000 // 请求超时时间
+// })
 
 // 定义 processDesensitize 函数，用于发送请求
 export const processDesensitize = async (data) => {
