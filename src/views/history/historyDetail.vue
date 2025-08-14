@@ -2,20 +2,32 @@
   <div class="detail-container">
     <!-- 预设展示区 -->
     <div class="preset-section">
-      <div class="preset-title">脱敏预设</div>
-      <div class="preset-box">
-        <span 
-          v-for="(preset, index) in presets" 
-          :key="index" 
-          class="preset-tag"
-        >
-          {{ preset }}
-        </span>
-
+      <div class="section-header">
+        <div class="preset-title">脱敏预设</div>
+        <button class="copy-btn" @click="copyPresets">
+          <span class="copy-icon">⎘</span> 复制预设
+        </button>
       </div>
-      <button class="copy-btn" @click="copyPresets">
-        <span class="copy-icon">⎘</span> 复制预设
-      </button>
+      
+      <div class="preset-content">
+        <div class="preset-box">
+          <div class="sub-title">关键词</div>
+          <div class="tags-container">
+            <span 
+              v-for="(preset, index) in presets" 
+              :key="index" 
+              class="preset-tag"
+            >
+              {{ preset }}
+            </span>
+          </div>
+        </div>
+        
+        <div class="example-box">
+          <div class="sub-title">自定义输入示例</div>
+          <div class="example-content">{{ exampleText }}</div>
+        </div>
+      </div>
     </div>
     
     <!-- 内容展示区 -->
@@ -49,7 +61,8 @@ export default {
   data() {
     return {
       // 模拟数据 - 实际应从API获取
-      presets: ['金额', '时间', '工作单位', '身份证号', '手机号码', '手机号码', '手机号码', '手机号码', '手机号码', '手机号码', '手机号码', '手机号码', '手机号码', '手机号码', '手机号码', '手机号码', '手机号码'],
+      presets: ['金额', '时间', '工作单位', '身份证号', '手机号码'],
+      exampleText: '这是一段用户自定义的输入示例文本，展示了用户通常提供的输入格式和内容',
       originalText: `这是一段包含敏感信息的文本示例：
       用户姓名：张三
       身份证号：320***********1234
@@ -87,9 +100,13 @@ export default {
   },
   methods: {
     copyPresets() {
-      const text = this.presets.join(',');
+      const data = {
+        keywords: this.presets,
+        example: this.exampleText
+      };
+      const text = JSON.stringify(data, null, 2);
       this.copyToClipboard(text);
-      this.$message.success('预设已复制到剪贴板');
+      this.$message.success('预设(JSON格式)已复制到剪贴板');
     },
     
     copyOriginalText() {
@@ -135,45 +152,76 @@ h2 {
   border-radius: 8px;
 }
 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
 
 .preset-title {
   font-weight: bold;
-  margin-bottom: 10px;
   color: #333;
   font-size: 18px;
+  margin: 0;
 }
 
-.preset-box {
+.preset-content {
+  display: flex;
+  gap: 20px;
+}
+
+.preset-box, .example-box {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 15px;
+}
+
+.sub-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #666;
+  font-size: 16px;
+}
+
+.tags-container {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  position: relative;
-  min-height: 60px;
-  padding-top: 6px;
+  gap: 8px;
 }
-
-
 
 .preset-tag {
   background: #f0f9eb;
   color: #67c23a;
   padding: 6px 12px;
   border-radius: 6px;
+  font-size: 14px;
+}
+
+.example-content {
+  white-space: pre-wrap;
   font-size: 16px;
+  line-height: 1.6;
+  color: #555;
+  padding: 8px;
+  background: #f9f9f9;
+  border-radius: 4px;
+  min-height: 60px;
 }
 
 .copy-btn {
   background: white;
   border: 1px solid #ddd;
   border-radius: 4px;
-  padding: 6px 12px;
+  padding: 8px 15px;
   cursor: pointer;
   display: flex;
   align-items: center;
   transition: all 0.2s;
-  margin-left: auto;
   font-size: 16px;
+  height: fit-content;
 }
 
 .copy-btn:hover {
@@ -214,6 +262,7 @@ h2 {
 .box-title {
   font-weight: bold;
   color: #333;
+  flex-grow: 1;
 }
 
 .box-content {
@@ -236,6 +285,10 @@ h2 {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  .preset-content {
+    flex-direction: column;
+  }
+  
   .content-section {
     grid-template-columns: 1fr;
   }

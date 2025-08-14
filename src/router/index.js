@@ -66,6 +66,19 @@ export const constantRoutes = [
   },
 
   {
+    path: '/preset',
+    component: Layout,
+    children: [
+      {
+        path: 'preset',
+        name: 'Preset',
+        component: () => import('@/views/preset/index'),
+        meta: { title: '预设广场', icon: 'table' }
+      }
+    ]
+  },
+
+  {
     path: '/',
     component: Layout,
     redirect: '/dashboard',

@@ -4,82 +4,96 @@
     <div class="container">
       <el-row :gutter="20">
         <!-- 左侧控制面板 -->
-        <el-col :span="10">
+        <el-col :span="8">
           <el-card class="box-card">
             <div slot="header">
-           <span style="font-size: 20px; font-weight: bold;">控制面板</span>
-           </div>
+              <span style="font-size: 20px; font-weight: bold;">脱敏关键词选择</span>
+            </div>
 
-
-            <!-- 特殊示例输入 -->
+            <!-- 自定义示例输入 -->
             <div class="control-section">
-              <h4>特殊示例输入</h4>
+              <h4>自定义示例输入</h4>
               <el-input
                 type="textarea"
                 :rows="3"
                 v-model="exampleText"
                 placeholder="示例：[姓名'张三'][时间'2024年9月21日']..."
               ></el-input>
-              <div class="flex-between mt-10">
-                <!-- 深绿色“提取”按钮，悬停变浅，按下变深 -->
-                <el-button
-                  size="small"
-                  @click="parseExample"
-                  :disabled="!exampleText"
-                  @mouseenter="hoverExtract = true"
-                  @mouseleave="hoverExtract = false"
-                  @mousedown.native="pressedExtract = true"
-                  @mouseup.native="pressedExtract = false"
-                  :style="{
-                    backgroundColor: pressedExtract ? '  #98b0a3' : (hoverExtract ? '#3e7b5a' : '#2e5c42'),
-                    borderColor: pressedExtract ? '#ecf4f0' : (hoverExtract ? '#3e7b5a' : '#2e5c42'),
-                    color: '#fff',
-                    transition: 'all 0.2s ease',
-                    transform: pressedExtract ? 'scale(0.98)' : 'scale(1)'
-                  }"
-                >提取</el-button>
-
-                <!-- 红色“清空”按钮保持默认 danger 类型 -->
-                <el-button
-                  type="danger"
-                  size="small"
-                  @click="clearKeywords"
-                  :disabled="!keywords.length"
-                  @mousedown.native="pressedClear = true"
-                  @mouseup.native="pressedClear = false"
-                  @mouseleave.native="pressedClear = false"
-                  :style="{
-                    transition: 'all 0.2s ease',
-                    transform: pressedClear ? 'scale(0.98)' : 'scale(1)'
-                  }"
-                >清空关键词</el-button>
-              </div>
-            </div>
-
-
-
-
-
-
-            <!-- 已提取关键词 -->
-            <div class="control-section mt-20">
-              <h4>已提取脱敏关键词类别</h4>
-              <div class="keyword-tags">
-                <el-tag
-                  v-for="(kw, index) in keywords"
-                  :key="index"
-                  type="success"
-                  closable
-                  @close="removeKeyword(kw)"
-                  class="mr-5 mb-5"
-                >{{ kw }}</el-tag>
-                <span v-if="!keywords.length" class="text-muted">无已提取类别</span>
+              <div class="flex-between mt-10" style="display: flex; justify-content: space-between;">
+                <!-- 操作按钮组 -->
+                <div>
+                  <!-- 提取按钮 -->
+                  <el-button
+                    size="small"
+                    @click="parseExample"
+                    :disabled="!exampleText"
+                    @mouseenter="hoverExtract = true"
+                    @mouseleave="hoverExtract = false"
+                    @mousedown.native="pressedExtract = true"
+                    @mouseup.native="pressedExtract = false"
+                    :style="{
+                      backgroundColor: pressedExtract ? '#98b0a3' : (hoverExtract ? '#3e7b5a' : '#2e5c42'),
+                      borderColor: pressedExtract ? '#ecf4f0' : (hoverExtract ? '#3e7b5a' : '#2e5c42'),
+                      color: '#fff',
+                      transition: 'all 0.2s ease',
+                      transform: pressedExtract ? 'scale(0.98)' : 'scale(1)'
+                    }"
+                  >提取</el-button>
+                  
+                  <!-- 粘贴预设 -->
+                  <el-button
+                    size="small"
+                    type="primary"
+                    @click="pastePreset"
+                    @mousedown.native="pressedPaste = true"
+                    @mouseup.native="pressedPaste = false"
+                    @mouseleave.native="pressedPaste = false"
+                    :style="{
+                      transition: 'all 0.2s ease',
+                      transform: pressedPaste ? 'scale(0.98)' : 'scale(1)',
+                      marginLeft: '10px'
+                    }"
+                  >粘贴预设</el-button>
+                </div>
+                
+                <div>
+                  <!-- 复制预设 -->
+                  <el-button
+                    size="small"
+                    type="info"
+                    @click="copyPreset"
+                    :disabled="!keywords.length && !exampleText"
+                    @mousedown.native="pressedCopy = true"
+                    @mouseup.native="pressedCopy = false"
+                    @mouseleave.native="pressedCopy = false"
+                    :style="{
+                      transition: 'all 0.2s ease',
+                      transform: pressedCopy ? 'scale(0.98)' : 'scale(1)',
+                      marginRight: '10px'
+                    }"
+                  >复制预设</el-button>
+                  
+                  <!-- 清空关键词 -->
+                  <el-button
+                    type="danger"
+                    size="small"
+                    @click="clearKeywords"
+                    :disabled="!keywords.length"
+                    @mousedown.native="pressedClear = true"
+                    @mouseup.native="pressedClear = false"
+                    @mouseleave.native="pressedClear = false"
+                    :style="{
+                      transition: 'all 0.2s ease',
+                      transform: pressedClear ? 'scale(0.98)' : 'scale(1)'
+                    }"
+                  >清空关键词</el-button>
+                </div>
               </div>
             </div>
 
             <!-- 常用关键词 -->
             <div class="control-section mt-20">
-              <h4>常用脱敏关键词</h4>
+              <h4>常用关键词</h4>
               <div class="keyword-tags">
                 <el-tag
                   v-for="(kw, index) in commonKeywords"
@@ -91,9 +105,25 @@
                 >{{ kw }}</el-tag>
               </div>
             </div>
+
+            <!-- 已选择关键词 -->
+            <div class="control-section mt-20">
+              <h4>已选择关键词</h4>
+              <div class="keyword-tags">
+                <el-tag
+                  v-for="(kw, index) in keywords"
+                  :key="index"
+                  type="success"
+                  closable
+                  @close="removeKeyword(kw)"
+                  class="mr-5 mb-5"
+                >{{ kw }}</el-tag>
+                <span v-if="!keywords.length" class="text-muted">暂无选择的关键词</span>
+              </div>
+            </div>
           </el-card>
 
-          <el-card class="box-card" style="margin-top: 20px; height: 188px;">
+          <el-card class="box-card" style="margin-top: 20px;">
              <div slot="header">
            <span style="font-size: 20px; font-weight: bold;">脱敏算法选择</span>
            </div>
@@ -113,7 +143,7 @@
         </el-col>
 
         <!-- 右侧文本处理区 -->
-        <el-col :span="14">
+        <el-col :span="16">
           <el-card class="box-card">
              <div slot="header">
            <span style="font-size: 20px; font-weight: bold;">文本处理区</span>
@@ -123,9 +153,6 @@
             <!-- 输入 -->
             <div class="text-box">
               <h4>输入待处理文本</h4>
-
-
-
               <el-input
                 type="textarea"
                 :rows="15"
@@ -133,6 +160,7 @@
                 v-model="inputText"
                 resize="none"
                 class="input-area"
+                style="font-size: 16px;"
               />
 
               <p v-if="uploadedFileName" style="color: #409EFF; font-size: 13px; display: flex; align-items: center; gap: 8px;">
@@ -212,7 +240,7 @@
           <div class="output-entity-container" style="display: flex; gap: 20px; align-items: flex-start;">
             
             <!-- 左半部分：输出框 + 按钮 -->
-            <div class="output-section" style="flex: 1;">
+            <div class="output-section" style="flex: 5;">
               <div class="text-box mt-20">
                 <h4>输出处理后文本</h4>
                 <el-input
@@ -304,7 +332,7 @@
             </div>
 
             <!-- 右半部分：实体替换 -->
-            <div class="entity-section" style="flex: 1;">
+            <div class="entity-section" style="flex: 3;">
               <!-- 将标题挪到框外，与左侧对齐 -->
               <div style="margin-top: 20px;">
                 <h4>实体替换结果</h4>
@@ -315,7 +343,7 @@
                 <el-table
                   :data="entityPairs.slice(0, 3)"
                   border
-                  style="width: 100%;"
+                  style="width: 100%; font-size: 16px;"
                   size="small"
                 >
                   <el-table-column label="处理前" prop="before" />
@@ -330,22 +358,15 @@
 
 
             <!-- Dialog 弹窗 -->
-            <el-dialog title="全部实体替换列表" :visible.sync="dialogVisible" width="60%">
-              <el-table
-                :data="entityPairs"
-                border
-                style="width: 100%;"
-                size="medium"
-                max-height="400"
-              >
-                <el-table-column label="处理前" prop="before" />
-                <el-table-column label="处理后" prop="after" />
+            <el-dialog title="全部实体替换列表" :visible.sync="dialogVisible" width="60%" class="custom-dialog">
+              <el-table :data="entityPairs" style="width: 100%; font-size: 16px;" size="medium" max-height="400" class="custom-table">
+                <el-table-column label="处理前" prop="before" header-align="center" align="center"/>
+                <el-table-column label="处理后" prop="after" header-align="center" align="center"/>
               </el-table>
               <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogVisible = false">关闭</el-button>
+                <el-button @click="dialogVisible = false" size="small" class="close-btn">关闭</el-button>
               </span>
-            </el-dialog>            
-
+            </el-dialog>
           </div>
 
           </el-card>
@@ -388,6 +409,13 @@ export default {
         { before: '大米集团', after: '[工作单位]' },
         { before: '13812345678', after: '[电话号码]' },
         { before: 'zhangsan@example.com', after: '[邮箱]' },
+        { before: '张三', after: '[姓名]' },
+        { before: '2024年9月21日', after: '[时间]' },
+        { before: '梅花西路128号', after: '[地点]' },
+        { before: '李海欣', after: '[姓名]' },
+        { before: '大米集团', after: '[工作单位]' },
+        { before: '13812345678', after: '[电话号码]' },
+        { before: 'zhangsan@example.com', after: '[邮箱]' },
       ],
 
 
@@ -423,7 +451,7 @@ export default {
         '同义替换': 2,
         '基于示例学习': 3
       },
-      selectedAlgorithm: '规则匹配',
+      selectedAlgorithm: '关键词模糊',
       defaultDemoData: {
         姓名: {
           原始语句: "张三在会议中提出了建议。",
@@ -496,67 +524,104 @@ export default {
   //     reader.readAsText(file, 'utf-8');
   //   });
   // },
-  handleUpload(uploadFile) {
-  const file = uploadFile.raw || uploadFile.file;
-  const reader = new FileReader();
+    handleUpload(uploadFile) {
+      const file = uploadFile.raw || uploadFile.file;
+      const reader = new FileReader();
 
-  reader.onload = () => {
-  const base64Content = reader.result.split(',')[1];
+      reader.onload = () => {
+      const base64Content = reader.result.split(',')[1];
 
-  this.uploadedFileName = file.name;
-  this.uploadedFileContent = {
-    filename: file.name,
-    content: base64Content,
-    content_type: file.type || 'application/octet-stream'
-  };
+      this.uploadedFileName = file.name;
+      this.uploadedFileContent = {
+        filename: file.name,
+        content: base64Content,
+        content_type: file.type || 'application/octet-stream'
+      };
 
-  this.$message.success('✅ 文件读取成功：' + file.name);
-  console.log("file 字段：", this.uploadedFileContent);
+      this.$message.success('✅ 文件读取成功：' + file.name);
+      console.log("file 字段：", this.uploadedFileContent);
 
-  };
+      };
 
-  reader.onerror = (e) => {
-    this.$message.error('❌ 文件读取失败');
-    console.error(e);
-  };
+      reader.onerror = (e) => {
+        this.$message.error('❌ 文件读取失败');
+        console.error(e);
+      };
 
-  reader.readAsDataURL(file);
-},
+      reader.readAsDataURL(file);
+    },
 
+    async copyPreset() {
+      try {
+        const preset = {
+          keywords: [...this.keywords],
+          example: this.exampleText
+        };
+        
+        await navigator.clipboard.writeText(JSON.stringify(preset, null, 2));
+        this.$message.success('预设已复制到剪贴板');
+      } catch (error) {
+        console.error('复制预设失败:', error);
+        this.$message.error('复制预设失败，请检查浏览器权限');
+      }
+    },
+
+    async pastePreset() {
+      try {
+        const text = await navigator.clipboard.readText();
+        const preset = JSON.parse(text);
+        
+        if (preset.keywords && Array.isArray(preset.keywords)) {
+          // 添加新关键词，避免重复
+          preset.keywords.forEach(keyword => {
+            if (!this.keywords.includes(keyword)) {
+              this.keywords.push(keyword);
+            }
+          });
+        }
+        
+        if (preset.example) {
+          this.exampleText = preset.example;
+        }
+      } catch (error) {
+        console.error('粘贴预设失败:', error);
+        this.$message.error('粘贴预设失败，请检查剪贴板内容是否为有效JSON格式');
+      }
+    },
 
     handleFileChange(file, fileList) {
-    this.uploadedFiles = fileList.map(item => item.raw || item); // 存储上传的文件列表
-  },
+      this.uploadedFiles = fileList.map(item => item.raw || item); // 存储上传的文件列表
+    },
 
-    // 新增差异高亮函数，只改颜色，黄色字显示差异，黑色字显示相同
-  highlightDiff(resource, result) {
-    if (!resource || !result) return result;
+      // 新增差异高亮函数，只改颜色，黄色字显示差异，黑色字显示相同
+    highlightDiff(resource, result) {
+      if (!resource || !result) return result;
 
-    let i = 0,
-      j = 0;
-    const resLen = resource.length;
-    const resultLen = result.length;
-    let highlighted = "";
+      let i = 0,
+        j = 0;
+      const resLen = resource.length;
+      const resultLen = result.length;
+      let highlighted = "";
 
-    while (i < resLen && j < resultLen) {
-      if (resource[i] === result[j]) {
-        highlighted += `<span style="color: black">${result[j]}</span>`;
-        i++;
-        j++;
-      } else {
+      while (i < resLen && j < resultLen) {
+        if (resource[i] === result[j]) {
+          highlighted += `<span style="color: black">${result[j]}</span>`;
+          i++;
+          j++;
+        } else {
+          highlighted += `<span style="color: yellow">${result[j]}</span>`;
+          j++;
+        }
+      }
+
+      // result多余部分算差异
+      while (j < resultLen) {
         highlighted += `<span style="color: yellow">${result[j]}</span>`;
         j++;
       }
-    }
 
-    // result多余部分算差异
-    while (j < resultLen) {
-      highlighted += `<span style="color: yellow">${result[j]}</span>`;
-      j++;
-    }
-
-    return highlighted;
-  },
+      return highlighted;
+    },
 
       // // 新增：提取实体对
       // extractEntityPairs(original, desensitized) {
@@ -915,6 +980,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  color: #888;
 }
 
 .clickable:hover {
