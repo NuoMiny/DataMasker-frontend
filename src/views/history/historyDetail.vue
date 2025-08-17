@@ -1,55 +1,51 @@
 <template>
-  <div class="detail-container">
-    <!-- 预设展示区 -->
-    <div class="preset-section">
-      <div class="section-header">
-        <div class="preset-title">脱敏预设</div>
-        <button class="copy-btn" @click="copyPresets">
-          <span class="copy-icon">⎘</span> 复制预设
-        </button>
-      </div>
-      
-      <div class="preset-content">
-        <div class="preset-box">
-          <div class="sub-title">关键词</div>
-          <div class="tags-container">
-            <span 
-              v-for="(preset, index) in presets" 
-              :key="index" 
-              class="preset-tag"
-            >
-              {{ preset }}
-            </span>
-          </div>
+  <div class="page-backgound">
+    <div class="detail-container">
+      <!-- 预设展示区 -->
+      <div class="preset-section">
+        <div class="section-header">
+          <div class="preset-title">脱敏预设</div>
+          <button class="copy-btn" @click="copyPresets">复制预设</button>
         </div>
         
-        <div class="example-box">
-          <div class="sub-title">自定义输入示例</div>
-          <div class="example-content">{{ exampleText }}</div>
+        <div class="preset-content">
+          <div class="preset-box">
+            <div class="sub-title">关键词</div>
+            <div class="tags-container">
+              <span 
+                v-for="(preset, index) in presets" 
+                :key="index" 
+                class="preset-tag"
+              >
+                {{ preset }}
+              </span>
+            </div>
+          </div>
+          
+          <div class="example-box">
+            <div class="sub-title">自定义输入示例</div>
+            <div class="example-content">{{ exampleText }}</div>
+          </div>
         </div>
-      </div>
-    </div>
-    
-    <!-- 内容展示区 -->
-    <div class="content-section">
-      <div class="text-box original-box">
-        <div class="box-header">
-          <div class="box-title">脱敏前文本</div>
-          <button class="copy-btn" @click="copyOriginalText">
-            <span class="copy-icon">⎘</span> 复制
-          </button>
-        </div>
-        <div class="box-content">{{ originalText }}</div>
       </div>
       
-      <div class="text-box desensitized-box">
-        <div class="box-header">
-          <div class="box-title">脱敏后文本</div>
-          <button class="copy-btn" @click="copyDesensitizedText">
-            <span class="copy-icon">⎘</span> 复制
-          </button>
+      <!-- 内容展示区 -->
+      <div class="content-section">
+        <div class="text-box original-box">
+          <div class="box-header">
+            <div class="box-title">脱敏前文本</div>
+            <button class="copy-btn" @click="copyOriginalText">复制</button>
+          </div>
+          <div class="box-content">{{ originalText }}</div>
         </div>
-        <div class="box-content">{{ desensitizedText }}</div>
+        
+        <div class="text-box desensitized-box">
+          <div class="box-header">
+            <div class="box-title">脱敏后文本</div>
+            <button class="copy-btn" @click="copyDesensitizedText">复制</button>
+          </div>
+          <div class="box-content">{{ desensitizedText }}</div>
+        </div>
       </div>
     </div>
   </div>
@@ -106,7 +102,7 @@ export default {
       };
       const text = JSON.stringify(data, null, 2);
       this.copyToClipboard(text);
-      this.$message.success('预设(JSON格式)已复制到剪贴板');
+      this.$message.success('预设已复制到剪贴板');
     },
     
     copyOriginalText() {
@@ -132,6 +128,10 @@ export default {
 </script>
 
 <style scoped>
+.page-backgound{
+  background-color: #ecf4f0;
+}
+
 .detail-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -150,6 +150,7 @@ h2 {
   border: 1px solid #e0e0e0;
   padding: 20px;
   border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .section-header {
@@ -212,25 +213,21 @@ h2 {
 }
 
 .copy-btn {
-  background: white;
-  border: 1px solid #ddd;
+  background: #a6a6a6;
+  border: 0px;
+  color: #fff;
   border-radius: 4px;
   padding: 8px 15px;
   cursor: pointer;
   display: flex;
   align-items: center;
   transition: all 0.2s;
-  font-size: 16px;
+  font-size: 14px;
   height: fit-content;
 }
 
 .copy-btn:hover {
-  background: #f0f0f0;
-}
-
-.copy-icon {
-  margin-right: 5px;
-  font-size: 18px;
+  background: #b7b7b7;
 }
 
 .content-section {
@@ -248,6 +245,7 @@ h2 {
   height: 370px;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .box-header {

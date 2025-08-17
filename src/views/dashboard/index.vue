@@ -1,6 +1,6 @@
 <template>
   <div class="readme-content">
-    <h1>How to use Vertical Domain Data Anonymization</h1>
+    <h1>如何使用垂直域数据匿名化</h1>
 
     <h2>1. 本工具可接受的待处理原文档格式</h2>
     <p>包括纯文本文件（.txt)、文字文档（.word）和pdf文档，其中word和pdf文档尽量不包含表格表单等内容，纯文字较好</p>

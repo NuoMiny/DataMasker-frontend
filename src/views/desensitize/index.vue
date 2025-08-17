@@ -19,9 +19,8 @@
                 v-model="exampleText"
                 placeholder="示例：[姓名'张三'][时间'2024年9月21日']..."
               ></el-input>
-              <div class="flex-between mt-10" style="display: flex; justify-content: space-between;">
-                <!-- 操作按钮组 -->
-                <div>
+              <div class="flex-between mt-10" style="display: flex;">
+                <div style="margin-left: auto;">
                   <!-- 提取按钮 -->
                   <el-button
                     size="small"
@@ -39,54 +38,6 @@
                       transform: pressedExtract ? 'scale(0.98)' : 'scale(1)'
                     }"
                   >提取</el-button>
-                  
-                  <!-- 粘贴预设 -->
-                  <el-button
-                    size="small"
-                    type="primary"
-                    @click="pastePreset"
-                    @mousedown.native="pressedPaste = true"
-                    @mouseup.native="pressedPaste = false"
-                    @mouseleave.native="pressedPaste = false"
-                    :style="{
-                      transition: 'all 0.2s ease',
-                      transform: pressedPaste ? 'scale(0.98)' : 'scale(1)',
-                      marginLeft: '10px'
-                    }"
-                  >粘贴预设</el-button>
-                </div>
-                
-                <div>
-                  <!-- 复制预设 -->
-                  <el-button
-                    size="small"
-                    type="info"
-                    @click="copyPreset"
-                    :disabled="!keywords.length && !exampleText"
-                    @mousedown.native="pressedCopy = true"
-                    @mouseup.native="pressedCopy = false"
-                    @mouseleave.native="pressedCopy = false"
-                    :style="{
-                      transition: 'all 0.2s ease',
-                      transform: pressedCopy ? 'scale(0.98)' : 'scale(1)',
-                      marginRight: '10px'
-                    }"
-                  >复制预设</el-button>
-                  
-                  <!-- 清空关键词 -->
-                  <el-button
-                    type="danger"
-                    size="small"
-                    @click="clearKeywords"
-                    :disabled="!keywords.length"
-                    @mousedown.native="pressedClear = true"
-                    @mouseup.native="pressedClear = false"
-                    @mouseleave.native="pressedClear = false"
-                    :style="{
-                      transition: 'all 0.2s ease',
-                      transform: pressedClear ? 'scale(0.98)' : 'scale(1)'
-                    }"
-                  >清空关键词</el-button>
                 </div>
               </div>
             </div>
@@ -107,18 +58,62 @@
             </div>
 
             <!-- 已选择关键词 -->
-            <div class="control-section mt-20">
+            <div class="control-section mt-20" style="display: flex; justify-content: space-between; align-items: center;">
               <h4>已选择关键词</h4>
-              <div class="keyword-tags">
-                <el-tag
-                  v-for="(kw, index) in keywords"
-                  :key="index"
-                  type="success"
-                  closable
-                  @close="removeKeyword(kw)"
-                  class="mr-5 mb-5"
-                >{{ kw }}</el-tag>
-                <span v-if="!keywords.length" class="text-muted">暂无选择的关键词</span>
+              <span 
+                @click="clearKeywords"
+                style="cursor: pointer; color: #888; text-decoration: underline; font-size: 14px;"
+                @mousedown="pressedClear = true"
+                @mouseup="pressedClear = false"
+                @mouseleave="pressedClear = false"
+                :style="{
+                  opacity: pressedClear ? 0.6 : 1,
+                  transition: 'all 0.1s ease'
+                }"
+              >清空</span>
+            </div>
+            <div class="keyword-tags">
+              <el-tag
+                v-for="(kw, index) in keywords"
+                :key="index"
+                type="success"
+                closable
+                @close="removeKeyword(kw)"
+                class="mr-5 mb-5"
+              >{{ kw }}</el-tag>
+              <span v-if="!keywords.length" class="text-muted">暂无选择的关键词</span>
+            </div>
+
+            <div class="flex-between mt-10" style="display: flex; justify-content: flex-end; margin-top: 20px;">
+              <div>
+                <!-- 复制预设 -->
+                <el-button
+                  size="small"
+                  type="info"
+                  @click="copyPreset"
+                  :disabled="!keywords.length && !exampleText"
+                  @mousedown.native="pressedCopy = true"
+                  @mouseup.native="pressedCopy = false"
+                  @mouseleave.native="pressedCopy = false"
+                  :style="{
+                    transition: 'all 0.2s ease',
+                    transform: pressedCopy ? 'scale(0.98)' : 'scale(1)',
+                    marginRight: '10px'
+                  }"
+                >复制预设</el-button>
+                <!-- 粘贴预设 -->
+                <el-button
+                  size="small"
+                  type="primary"
+                  @click="pastePreset"
+                  @mousedown.native="pressedPaste = true"
+                  @mouseup.native="pressedPaste = false"
+                  @mouseleave.native="pressedPaste = false"
+                  :style="{
+                    transition: 'all 0.2s ease',
+                    transform: pressedPaste ? 'scale(0.98)' : 'scale(1)',
+                  }"
+                >粘贴预设</el-button>
               </div>
             </div>
           </el-card>

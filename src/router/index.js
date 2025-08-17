@@ -31,6 +31,17 @@ import Layout from '@/layout'
  * all roles can be accessed
  */
 export const constantRoutes = [
+  {
+    path: '/login',
+    component: () => import('@/views/login/index'),
+    hidden: true
+  },
+  
+  {
+    path: '/404',
+    component: () => import('@/views/404'),
+    hidden: true
+  },
  
   {
     path: '/desensitize',
@@ -74,6 +85,13 @@ export const constantRoutes = [
         name: 'Preset',
         component: () => import('@/views/preset/index'),
         meta: { title: '预设广场', icon: 'table' }
+      },
+      {
+        path: 'detail/:id',
+        name: 'PresetDetail',
+        component: () => import('@/views/preset/presetDetail'),
+        meta: { title: '预设详情', activeMenu: '/preset/index' },
+        hidden: true
       }
     ]
   },
